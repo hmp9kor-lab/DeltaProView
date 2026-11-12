@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import {
   GitCompareArrows,
   Download,
@@ -12,10 +11,19 @@ import {
 } from "lucide-react";
 
 import "./App.css";
+import { fetchConfig, runComparison } from "./api";
 
-const api = axios.create({
-  baseURL: "/api",
-});
+// Numeric, segment-wise version compare so 1.10 > 1.9
+const compareVersions = (a, b) => {
+  const pa = String(a).split(".").map((n) => parseInt(n, 10) || 0);
+  const pb = String(b).split(".").map((n) => parseInt(n, 10) || 0);
+  const len = Math.max(pa.length, pb.length);
+  for (let i = 0; i < len; i++) {
+    const diff = (pa[i] || 0) - (pb[i] || 0);
+    if (diff !== 0) return diff;
+  }
+  return 0;
+};
 
 function App() {
   // Configuration data
@@ -34,7 +42,9 @@ function App() {
   const [loadingCompare, setLoadingCompare] = useState(false);
 
   const [error, setError] = useState("");
+  const [configError, setConfigError] = useState("");
   const [downloadBlob, setDownloadBlob] = useState(null);
+  const [downloadName, setDownloadName] = useState("DeltaProView.xlsx");
 
   // ----------------------------------
   // Load configuration from backend
@@ -45,30 +55,22 @@ function App() {
 
     const loadConfig = async () => {
       try {
-        const response = await api.get("/config");
+        const data = await fetchConfig();
 
-        const data = response.data;
-
-        let configurations = [];
-
-        if (Array.isArray(data)) {
-          configurations = data;
-        } else if (Array.isArray(data?.config)) {
-          configurations = data.config;
-        } else if (Array.isArray(data?.data)) {
-          configurations = data.data;
-        } else {
+        if (!Array.isArray(data)) {
           throw new Error("Invalid configuration response");
         }
 
         if (mounted) {
-          setConfigData(configurations);
+          setConfigData(data);
+          setConfigError("");
         }
       } catch (err) {
         console.error("Configuration loading failed:", err);
 
         if (mounted) {
           setConfigData([]);
+          setConfigError(err.message || "Failed to load configuration.");
         }
       } finally {
         if (mounted) {
@@ -178,38 +180,30 @@ function App() {
     setError("");
     setDownloadBlob(null);
 
-    const sorted = [...selectedRevisions].sort(
-      (a, b) => parseFloat(a.version) - parseFloat(b.version)
+    const sorted = [...selectedRevisions].sort((a, b) =>
+      compareVersions(a.version, b.version)
     );
 
     const [oldRev, newRev] = sorted;
 
     try {
-      const response = await api.post(
-        "/compare",
-        {
-          page_id: selectedMethodObj.pub_id,
-          rev1_id: newRev.id,
-          rev2_id: oldRev.id,
-          method_name: selectedMethod,
-          versions_text: `${newRev.version} and ${oldRev.version}`,
-        },
-        {
-          responseType: "blob",
-        }
+      const blob = await runComparison(
+        selectedMethodObj.pub_id,
+        newRev.id,
+        oldRev.id,
+        selectedMethod,
+        `${newRev.version} and ${oldRev.version}`
       );
-
-      const blob = new Blob([response.data], {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      });
 
       setDownloadBlob(blob);
+      setDownloadName(
+        `DeltaProView_${selectedMethod
+          .split(" ")[0]
+          .replace(/[^a-zA-Z0-9._-]/g, "")}_v${oldRev.version}_vs_v${newRev.version}.xlsx`
+      );
     } catch (err) {
       console.error("Comparison failed:", err);
-
-      setError(
-        "Comparison failed. Please check the backend connection and try again."
-      );
+      setError(err.message || "Comparison failed. Please try again.");
     } finally {
       setLoadingCompare(false);
     }
@@ -228,9 +222,7 @@ function App() {
 
     link.href = url;
 
-    link.download = `DeltaProView_${selectedMethod
-      .split(" ")[0]
-      .replace(/[^a-zA-Z0-9_-]/g, "")}.xlsx`;
+    link.download = downloadName;
 
     document.body.appendChild(link);
 
@@ -419,8 +411,8 @@ function App() {
               <AlertCircle size={17} />
 
               <span>
-                Backend not connected. Process options will
-                appear here once the backend is available.
+                {configError ||
+                  "No process configuration found. Check page_tree_config.xml on the backend."}
               </span>
             </div>
           )}

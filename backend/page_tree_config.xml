@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ProcLib_Comparision_Config>
+<Confluence_Page_Tree>
+    <Confluence_Page>
+        <Page_Name>MP-205.11-PS Requirements Elicitation_8.0</Page_Name>
+        <Pub_Page_Id>1031973710</Pub_Page_Id>
+        <Page_Revisions>
+            <Page_Revision>
+                <Revision>7.0</Revision>
+                <Rev_Page_Id>908754314</Rev_Page_Id>
+            </Page_Revision>
+            <Page_Revision>
+                <Revision>6.0</Revision>
+                <Rev_Page_Id>823840276</Rev_Page_Id>
+            </Page_Revision>
+            <Page_Revision>
+                <Revision>5.0</Revision>
+                <Rev_Page_Id>730563765</Rev_Page_Id>
+            </Page_Revision>
+            <Page_Revision>
+                <Revision>4.0</Revision>
+                <Rev_Page_Id>634333009</Rev_Page_Id>
+            </Page_Revision>
+            <Page_Revision>
+                <Revision>3.0</Revision>
+                <Rev_Page_Id>541090013</Rev_Page_Id>
+            </Page_Revision>
+        </Page_Revisions>
+    </Confluence_Page>
+    <Confluence_Page>
+        <Page_Name>MP-308.07-PS Problem Resolution Management in Development_4.4</Page_Name>
+        <Pub_Page_Id>1032068852</Pub_Page_Id>
+        <Page_Revisions>
+            <Page_Revision>
+                <Revision>4.3</Revision>
+                <Rev_Page_Id>908754058</Rev_Page_Id>
+            </Page_Revision>
+            <Page_Revision>
+                <Revision>4.2</Revision>
+                <Rev_Page_Id>823841690</Rev_Page_Id>
+            </Page_Revision>
+            <Page_Revision>
+                <Revision>4.1</Revision>
+                <Rev_Page_Id>730563548</Rev_Page_Id>
+            </Page_Revision>
+            <Page_Revision>
+                <Revision>4.0</Revision>
+                <Rev_Page_Id>634332728</Rev_Page_Id>
+            </Page_Revision>
+            <Page_Revision>
+                <Revision>3.0</Revision>
+                <Rev_Page_Id>541090278</Rev_Page_Id>
+            </Page_Revision>
+        </Page_Revisions>
+    </Confluence_Page>
+</Confluence_Page_Tree>
+</ProcLib_Comparision_Config>
